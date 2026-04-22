@@ -17,7 +17,7 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:4000');
+    const newSocket = io('http://51.21.251.124:4000');
     setSocket(newSocket);
 
     return () => {
