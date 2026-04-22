@@ -17,7 +17,8 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const newSocket = io('http://51.21.251.124:4000');
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
+    const newSocket = io(backendUrl);
     setSocket(newSocket);
 
     return () => {
