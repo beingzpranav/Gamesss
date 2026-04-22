@@ -1,0 +1,263 @@
+.room-lobby {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+}
+
+.lobby-container {
+  background: white;
+  border: 4px solid #000;
+  border-radius: 4px;
+  padding: 30px;
+  box-shadow: 12px 12px 0px #000;
+  width: 100%;
+  max-width: 800px;
+  transform: translate(-4px, -4px);
+}
+
+@media (max-width: 600px) {
+  .lobby-container {
+    padding: 15px;
+    border-radius: 4px;
+  }
+}
+
+.lobby-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 4px solid #000;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+@media (max-width: 600px) {
+  .lobby-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.code-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.button-small {
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  border-radius: 0px !important;
+}
+
+.copy-feedback {
+  color: #0bcecb;
+  background: #000;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 800;
+  border: 2px solid #000;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(5px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-5px); }
+}
+
+.lobby-header h2 {
+  font-size: 24px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.room-code {
+  color: #ff5277;
+  font-weight: 900;
+  font-size: 32px;
+  text-shadow: 2px 2px 0px #000;
+}
+
+.lobby-header p {
+  color: #000;
+  font-weight: 600;
+  margin: 0;
+}
+
+.lobby-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 768px) {
+  .lobby-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.players-section h3,
+.gm-controls h3 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #000;
+  text-transform: uppercase;
+  border-left: 6px solid #4deeea;
+  padding-left: 10px;
+}
+
+.players-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+@media (max-width: 600px) {
+  .players-list {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+.player-card {
+  background: #fff;
+  border-radius: 0;
+  padding: 15px;
+  text-align: center;
+  transition: all 0.15s;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.player-card.game-master {
+  background: #fff9c4;
+  border-color: #000;
+}
+
+.player-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-block;
+  background: #000;
+  color: #4deeea;
+  font-weight: 800;
+  border: 2px solid #000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  word-break: break-word;
+}
+
+.gm-controls {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 20px;
+  border: 2px solid #eee;
+}
+
+.gm-controls .button {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.word-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.button-group .button {
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.transfer-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.transfer-section h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.select-input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.transfer-section .button {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.waiting-message {
+  background: #e3f2fd;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  grid-column: 1 / -1;
+  color: #1976d2;
+  font-size: 16px;
+}

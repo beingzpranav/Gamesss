@@ -1,0 +1,145 @@
+.main-menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+}
+
+.menu-card {
+  background: white;
+  border: 4px solid #000;
+  border-radius: 4px;
+  padding: 40px;
+  box-shadow: 12px 12px 0px #000;
+  transform: translate(-4px, -4px);
+  max-width: 500px;
+  width: 100%;
+  animation: slideUp 0.3s ease-out;
+}
+
+@media (max-width: 600px) {
+  .menu-card {
+    padding: 20px;
+    border-radius: 4px;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.menu-header h1 {
+  font-size: 48px;
+  font-weight: 900;
+  margin-bottom: 10px;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+@media (max-width: 600px) {
+  .menu-header h1 {
+    font-size: 36px;
+  }
+}
+
+.menu-header p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+}
+
+.username-display {
+  color: #ff5277;
+  font-weight: 900;
+  text-transform: uppercase;
+  border-bottom: 3px solid #000;
+}
+
+.menu-card h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #000;
+  font-size: 28px;
+  font-weight: 800;
+  text-transform: uppercase;
+  border-bottom: 4px solid #000;
+  padding-bottom: 10px;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.menu-button {
+  padding: 20px;
+  font-size: 20px;
+  width: 100%;
+}
+
+.menu-info {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 4px solid #000;
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.menu-info p {
+  margin: 8px 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 800;
+  color: #000;
+  text-transform: uppercase;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 5px;
+  color: #999;
+  font-size: 12px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.button-group .button {
+  flex: 1;
+  padding: 12px;
+}
