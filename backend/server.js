@@ -11,7 +11,7 @@ app.use(express.json());
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://imposter.pranavk.tech"],
     methods: ["GET", "POST"]
   }
 });
