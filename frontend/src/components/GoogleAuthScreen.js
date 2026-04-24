@@ -18,9 +18,10 @@ function GoogleAuthScreen({ onAuthSuccess }) {
     setError(null);
 
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
-      
-      // Verify token with backend
+      const BACKEND_URL = (
+        process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'
+      ).replace(/\/$/, '')
+
       const response = await axios.post(`${BACKEND_URL}/api/auth/google`, {
         idToken: credentialResponse.credential,
         username
