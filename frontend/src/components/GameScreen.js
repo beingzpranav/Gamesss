@@ -9,7 +9,8 @@ function GameScreen({
   onStartVoting,
   onCastVote,
   onEndGame,
-  onNextRound
+  onNextRound,
+  onGoHome
 }) {
   const [hasVoted, setHasVoted] = useState(false);
 
@@ -27,6 +28,13 @@ function GameScreen({
   };
 
   if (gameState?.status === 'ended') {
+    const finalScores = gameState?.players?.map(p => ({
+      id: p.id,
+      username: p.username,
+      isGameMaster: p.isGameMaster,
+      points: gameState?.points?.[p.id] || 0
+    })).sort((a, b) => b.points - a.points);
+
     return (
       <div className="game-screen">
         <div className="game-container">
@@ -45,6 +53,25 @@ function GameScreen({
                 </div>
               </div>
             )}
+            {finalScores && finalScores.length > 0 && (
+              <div className="final-scores">
+                <h3>Final Scores</h3>
+                <div className="scores-list">
+                  {finalScores.map((player, idx) => (
+                    <div key={player.id} className="score-item">
+                      <span className="rank">#{idx + 1}</span>
+                      <span className="score-name">{player.username} {player.isGameMaster ? '👑' : ''}</span>
+                      <span className="score-value">⭐ {player.points}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="end-screen-actions">
+              <button className="button button-primary" onClick={onGoHome}>
+                🏠 Back to Home
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -126,6 +153,11 @@ function GameScreen({
                   <p className="word-reveal">
                     Imposter Word: <strong>{gameState?.votingResults?.imposterWord}</strong>
                   </p>
+                  {gameState?.votingResults?.isImposter ? (
+                    <p className="points-awarded">🎯 Correct voters earn +1 point!</p>
+                  ) : (
+                    <p className="points-awarded">🎯 Imposter earns +1 point!</p>
+                  )}
                 </div>
               </div>
             )}
@@ -141,6 +173,9 @@ function GameScreen({
                     {player.isGameMaster ? '👑' : '👤'}
                   </span>
                   <span className="player-name">{player.username}</span>
+                  {gameState?.points && gameState?.points[player.id] !== undefined && (
+                    <span className="player-points">⭐ {gameState.points[player.id]}</span>
+                  )}
                 </div>
               ))}
             </div>

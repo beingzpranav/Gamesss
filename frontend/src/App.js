@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import './App.css';
-import UsernameScreen from './components/UsernameScreen';
+import GoogleAuthScreen from './components/GoogleAuthScreen';
 import MainMenu from './components/MainMenu';
 import RoomLobby from './components/RoomLobby';
 import GameScreen from './components/GameScreen';
@@ -9,22 +9,72 @@ import GameScreen from './components/GameScreen';
 function App() {
   const [socket, setSocket] = useState(null);
   const [username, setUsername] = useState(null);
-  const [screen, setScreen] = useState('username'); // username, menu, lobby, game
+  const [authToken, setAuthToken] = useState(null);
+  const [screen, setScreen] = useState('auth'); // auth, menu, lobby, game
   const [roomCode, setRoomCode] = useState(null);
   const [isGameMaster, setIsGameMaster] = useState(false);
   const [room, setRoom] = useState(null);
   const [gameState, setGameState] = useState(null);
   const [error, setError] = useState(null);
 
+  // Check for existing auth token on mount
   useEffect(() => {
+    const storedToken = localStorage.getItem('authToken');
+    const storedUsername = localStorage.getItem('username');
+    const storedUserId = localStorage.getItem('userId');
+
+    if (storedToken && storedUsername && storedUserId) {
+      setAuthToken(storedToken);
+      setUsername(storedUsername);
+      setScreen('menu');
+    }
+  }, []);
+
+  // Initialize socket and authenticate
+  useEffect(() => {
+    if (!authToken) return;
+
     const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
-    const newSocket = io(backendUrl);
+    const newSocket = io(backendUrl, {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: Infinity
+    });
+
+    // Authenticate on connection
+    newSocket.on('connect', () => {
+      console.log('Socket connected, authenticating...');
+      newSocket.emit('authenticate', {
+        token: authToken,
+        username
+      });
+    });
+
+    newSocket.on('authenticated', (data) => {
+      console.log('Socket authenticated:', data);
+    });
+
+    // Handle authentication failure
+    newSocket.on('connect_error', (error) => {
+      console.error('Connection error:', error);
+      if (error.message && error.message.includes('Authentication')) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userId');
+        setAuthToken(null);
+        setUsername(null);
+        setScreen('auth');
+        setError('Session expired. Please login again.');
+      }
+    });
+
     setSocket(newSocket);
 
     return () => {
-      newSocket.close();
+      if (newSocket) newSocket.close();
     };
-  }, []);
+  }, [authToken, username]);
 
   useEffect(() => {
     if (!socket) return;
@@ -49,13 +99,19 @@ function App() {
       }));
     });
 
+    socket.on('userReconnected', (data) => {
+      setError(`${data.username} reconnected`);
+      setTimeout(() => setError(null), 3000);
+    });
+
     socket.on('wordAssigned', (data) => {
       setGameState(prev => ({
         ...prev,
         word: data.word,
         isImposter: data.isImposter,
         roundNumber: data.roundNumber,
-        players: data.players
+        players: data.players,
+        status: 'in-game'
       }));
       setScreen('game');
     });
@@ -77,6 +133,7 @@ function App() {
         players: data.players,
         votes: {}
       }));
+      setScreen('game');
     });
 
     socket.on('votingResults', (data) => {
@@ -84,6 +141,7 @@ function App() {
         ...prev,
         status: 'voting-result',
         votingResults: data,
+        points: data.points,
         votes: {}
       }));
       // Auto reset vote status for next voting round
@@ -99,6 +157,10 @@ function App() {
         users: data.users,
         gameMaster: data.newGameMasterId
       }));
+      if (data.reason === 'Previous GM disconnected') {
+        setError(`${data.newGameMasterName} is now Game Master`);
+        setTimeout(() => setError(null), 3000);
+      }
     });
 
     socket.on('userLeft', (data) => {
@@ -114,7 +176,8 @@ function App() {
         ...prev,
         status: 'ended',
         gameHistory: data.gameHistory,
-        finalStats: data.finalStats
+        finalStats: data.finalStats,
+        points: data.points
       }));
     });
 
@@ -129,13 +192,26 @@ function App() {
 
     socket.on('error', (data) => {
       setError(data.message);
-      setTimeout(() => setError(null), 3000);
+      
+      // Redirect to login for authentication errors
+      if (data.message && (data.message.includes('Session not found') || data.message.includes('Invalid or expired token'))) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userId');
+        setAuthToken(null);
+        setUsername(null);
+        setScreen('auth');
+        setTimeout(() => setError(null), 3000);
+      } else {
+        setTimeout(() => setError(null), 3000);
+      }
     });
 
     return () => {
       socket.off('roomCreated');
       socket.off('roomJoined');
       socket.off('userJoined');
+      socket.off('userReconnected');
       socket.off('wordAssigned');
       socket.off('roundStarted');
       socket.off('votingStarted');
@@ -148,10 +224,21 @@ function App() {
     };
   }, [socket]);
 
-  const handleUsernameSubmit = (enteredUsername) => {
-    setUsername(enteredUsername);
-    socket.emit('setUsername', enteredUsername);
+  const handleAuthSuccess = (authData) => {
+    setAuthToken(authData.token);
+    setUsername(authData.username);
+    localStorage.setItem('userId', authData.userId);
     setScreen('menu');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('username');
+    localStorage.removeItem('userId');
+    setAuthToken(null);
+    setUsername(null);
+    setScreen('auth');
+    if (socket) socket.close();
   };
 
   const handleCreateRoom = (maxParticipants) => {
@@ -194,12 +281,20 @@ function App() {
     setIsGameMaster(false);
   };
 
+  const handleGoHome = () => {
+    setScreen('menu');
+    setRoomCode(null);
+    setRoom(null);
+    setGameState(null);
+    setIsGameMaster(false);
+  };
+
   return (
     <div className="App">
       {error && <div className="error-banner">{error}</div>}
       
-      {screen === 'username' && (
-        <UsernameScreen onSubmit={handleUsernameSubmit} />
+      {screen === 'auth' && (
+        <GoogleAuthScreen onAuthSuccess={handleAuthSuccess} />
       )}
 
       {screen === 'menu' && (
@@ -207,6 +302,7 @@ function App() {
           username={username}
           onCreateRoom={handleCreateRoom}
           onJoinRoom={handleJoinRoom}
+          onLogout={handleLogout}
         />
       )}
 
@@ -233,6 +329,7 @@ function App() {
           onCastVote={handleCastVote}
           onEndGame={handleEndGame}
           onNextRound={handleNextRound}
+          onGoHome={handleGoHome}
         />
       )}
     </div>
